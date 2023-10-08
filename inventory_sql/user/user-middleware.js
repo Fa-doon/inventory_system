@@ -1,10 +1,10 @@
 const joi = require("joi");
 
-async function validateNewUser(req, res, next) {
+const validateNewUser = async (req, res, next) => {
   try {
     const user = req.body;
 
-    const schema = joi.object({
+    const userSchema = joi.object({
       name: joi.string().required().messages({
         "string.base": "Invalid type, please provide a valid string.",
         "string.required": "Name is required",
@@ -23,27 +23,30 @@ async function validateNewUser(req, res, next) {
       phoneNumber: joi.string().required().messages({
         "string.required": "Phone number is required",
       }),
-      gender: joi.string().valid("male", "female").required().messages({
+      gender: joi.string().required().valid("male", "female").messages({
         "string.required": "Gender is required",
       }),
     });
 
-    const valid = await schema.validateAsync(user, { abortEarly: true });
+    await userSchema.validateAsync(user, { abortEarly: true });
 
     next();
-  } catch (error) {
+  } catch (err) {
     res.status(422).json({
       message: `Something went wrong`,
-      error: error.message,
+      error: err.message,
     });
   }
-}
+};
 
-async function validateLogin(req, res, next) {
+const validateExistingUser = async (req, res, next) => {
   try {
-    const user = req.body;
+    const user = {
+      email: req.body.email,
+      password: req.body.password,
+    };
 
-    const schema = joi.object({
+    const userSchema = joi.object({
       email: joi.string().email().required().messages({
         "string.email": "Please provide a valid email address.",
         "string.required": "Email is required",
@@ -53,7 +56,7 @@ async function validateLogin(req, res, next) {
       }),
     });
 
-    await schema.validateAsync(user, { abortEarly: false });
+    await userSchema.validateAsync(user, { abortEarly: false });
 
     next();
   } catch (error) {
@@ -62,9 +65,9 @@ async function validateLogin(req, res, next) {
       error: error.message,
     });
   }
-}
+};
 
 module.exports = {
   validateNewUser,
-  validateLogin,
+  validateExistingUser,
 };

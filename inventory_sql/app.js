@@ -1,17 +1,15 @@
 const express = require("express");
-const { connectToDb } = require("./db");
-const userRoute = require("./users/users-route");
-const productRoute = require("./product/product-route");
 require("dotenv").config();
+const sequelize = require("./config/sequelize");
+const userRoute = require("./user/user-route");
+const productRoute = require("./product/product-route");
 
 const PORT = process.env.PORT;
-
 const app = express();
 
-// connect to MongoDb
-connectToDb();
-
+// app.use(express.urlencoded());
 app.use(express.json());
+
 app.use("/users", userRoute);
 app.use("/products", productRoute);
 
@@ -30,6 +28,15 @@ app.use((err, req, res, next) => {
   });
 });
 
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log(`Connection to db successful`);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is listening on http://localhost:${PORT}`);
 });
