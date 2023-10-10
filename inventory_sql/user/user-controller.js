@@ -12,6 +12,7 @@ async function createUser(req, res) {
       res.status(409).json({
         message: `Email already exists`,
       });
+      return;
     } else {
       models.User.create(userDetails).then((result) => {
         res.status(200).json({
@@ -37,6 +38,7 @@ async function loginUser(req, res) {
       res.status(401).json({
         message: `User not found. Please sign up`,
       });
+      return;
     } else {
       const validPassword = await existingUser.validPassword(userInfo.password);
 
